@@ -1,6 +1,10 @@
 package main
 
-import "time"
+import (
+	"time"
+
+	"gomodules.xyz/mailer"
+)
 
 type Contact struct {
 	Email            string    `csv:"email"`
@@ -43,8 +47,7 @@ type DripCampaign struct {
 
 type DripCampaignStep struct {
 	WaitTime time.Duration
-	Subject  string
-	Body     string
+	Mailer   mailer.Mailer
 }
 
 func (dc DripCampaign) Prepare(c *Contact, t time.Time) {

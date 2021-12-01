@@ -4,10 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gocarina/gocsv"
-	"google.golang.org/api/option"
 	"log"
 	"time"
+
+	"github.com/gocarina/gocsv"
+	"github.com/mailgun/mailgun-go/v4"
+	"gomodules.xyz/mailer"
+	"google.golang.org/api/option"
 
 	gdrive "gomodules.xyz/gdrive-utils"
 	"gomodules.xyz/sets"
@@ -48,25 +51,7 @@ func main_add_contact() {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	campaign := DripCampaign{
-		Steps: []DripCampaignStep{
-			{
-				WaitTime: 0,
-				Subject:  "Welcome to {{.Product}}",
-				Body:     "Hey {{.Name}}, Thanks for using {{.Product}}!",
-			},
-			{
-				WaitTime: 10 * time.Second,
-				Subject:  "How are things with {{.Product}}",
-				Body:     "Hey {{.Name}}, How are things going with {{.Product}}. If you need help, contact support@appscode.com",
-			},
-			{
-				WaitTime: 30 * time.Second,
-				Subject:  "Your trial ending soon",
-				Body:     "Hey {{.Name}}, your trial of {{.Product}} is ending soon",
-			},
-		},
-	}
+	campaign := getDripCampaign()
 
 	type ContactData struct {
 		Name    string
@@ -97,42 +82,14 @@ func main() {
 		log.Fatalf("Unable to create client: %v", err)
 	}
 
+	var mg mailgun.Mailgun
+
 	srv, err := sheets.NewService(context.TODO(), option.WithHTTPClient(client))
 	if err != nil {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	// https://docs.google.com/spreadsheets/d/1evwv2ON94R38M-Lkrw8b6dpVSkRYHUWsNOuI7X0_-zA/edit#gid=584220329
-	const (
-		spreadsheetId = "10Jx3-1Ww2UQ7xNjs9-CRvJX4iIA22EDu-EsLKoHp1hc"
-		sheetName     = "NEW_SIGNUP"
-		// header        = "email"
-	)
-
-	campaign := DripCampaign{
-		Steps: []DripCampaignStep{
-			{
-				WaitTime: 0,
-				Subject:  "Welcome to {{.Product}}",
-				Body:     "Hey {{.Name}}, Thanks for using {{.Product}}!",
-			},
-			{
-				WaitTime: 10 * time.Second,
-				Subject:  "How are things with {{.Product}}",
-				Body:     "Hey {{.Name}}, How are things going with {{.Product}}. If you need help, contact support@appscode.com",
-			},
-			{
-				WaitTime: 30 * time.Second,
-				Subject:  "Your trial ending soon",
-				Body:     "Hey {{.Name}}, your trial of {{.Product}} is ending soon",
-			},
-		},
-	}
-
-	type ContactData struct {
-		Name    string
-		Product string
-	}
+	campaign := getDripCampaign()
 
 	reader, err := gdrive.NewReader(srv, spreadsheetId, sheetName, 1)
 	if err != nil {
@@ -149,39 +106,93 @@ func main() {
 			continue
 		}
 		if c.Step_0_Timestamp.IsZero() || now.After(c.Step_0_Timestamp.Time) && !c.Step_0_Done {
-			processStep(srv, 0, campaign.Steps[0], *c)
+			processStep(srv, mg, 0, campaign.Steps[0], *c)
 			continue
 		}
 		if c.Step_1_Timestamp.IsZero() || now.After(c.Step_1_Timestamp.Time) && !c.Step_1_Done {
-			processStep(srv, 1, campaign.Steps[1], *c)
+			processStep(srv, mg, 1, campaign.Steps[1], *c)
 			continue
 		}
 		if c.Step_2_Timestamp.IsZero() || now.After(c.Step_2_Timestamp.Time) && !c.Step_2_Done {
-			processStep(srv, 2, campaign.Steps[2], *c)
+			processStep(srv, mg, 2, campaign.Steps[2], *c)
 			continue
 		}
 		if c.Step_3_Timestamp.IsZero() || now.After(c.Step_3_Timestamp.Time) && !c.Step_3_Done {
-			processStep(srv, 3, campaign.Steps[3], *c)
+			processStep(srv, mg, 3, campaign.Steps[3], *c)
 			continue
 		}
 		if c.Step_4_Timestamp.IsZero() || now.After(c.Step_4_Timestamp.Time) && !c.Step_4_Done {
-			processStep(srv, 4, campaign.Steps[4], *c)
+			processStep(srv, mg, 4, campaign.Steps[4], *c)
 			continue
 		}
 	}
 }
 
-func processStep(srv *sheets.Service, stepIndex int, step DripCampaignStep,  c Contact) error {
+func getDripCampaign() DripCampaign {
+	campaign := DripCampaign{
+		Steps: []DripCampaignStep{
+			{
+				WaitTime: 0,
+				Mailer: mailer.Mailer{
+					Sender:          "",
+					BCC:             "",
+					ReplyTo:         "",
+					Subject:         "Welcome to {{.Product}}",
+					Body:            "Hey {{.Name}}, Thanks for using {{.Product}}!",
+					Params:          nil,
+					AttachmentBytes: nil,
+					GDriveFiles:     nil,
+					GoogleDocIds:    nil,
+					EnableTracking:  false,
+				},
+			},
+			{
+				WaitTime: 10 * time.Second,
+				Mailer: mailer.Mailer{
+					Sender:          "",
+					BCC:             "",
+					ReplyTo:         "",
+					Subject:         "How are things with {{.Product}}",
+					Body:            "Hey {{.Name}}, How are things going with {{.Product}}. If you need help, contact support@appscode.com",
+					Params:          nil,
+					AttachmentBytes: nil,
+					GDriveFiles:     nil,
+					GoogleDocIds:    nil,
+					EnableTracking:  false,
+				},
+			},
+			{
+				WaitTime: 30 * time.Second,
+				Mailer: mailer.Mailer{
+					Sender:          "",
+					BCC:             "",
+					ReplyTo:         "",
+					Subject:         "Your trial ending soon",
+					Body:            "Hey {{.Name}}, your trial of {{.Product}} is ending soon",
+					Params:          nil,
+					AttachmentBytes: nil,
+					GDriveFiles:     nil,
+					GoogleDocIds:    nil,
+					EnableTracking:  false,
+				},
+			},
+		},
+	}
+	return campaign
+}
+
+func processStep(srv *sheets.Service, mg mailgun.Mailgun, stepIndex int, step DripCampaignStep, c Contact) error {
 	var data Contact
 	if err := json.Unmarshal([]byte(c.Data), &data); err != nil {
 		return err
 	}
 
-	// exec subject
-	// step.Subject
-
-	// exec body
-	// step.Body
+	mailer := step.Mailer
+	mailer.Params = &data
+	err := mailer.SendMail(mg, c.Email, "", nil)
+	if err != nil {
+		return err
+	}
 
 	switch stepIndex {
 	case 0:
@@ -201,7 +212,7 @@ func processStep(srv *sheets.Service, stepIndex int, step DripCampaignStep,  c C
 		By: func(v []interface{}) (int, error) {
 			for idx, entry := range v {
 				if entry.(string) == c.Email {
-					return idx,  nil
+					return idx, nil
 				}
 			}
 			return -1, fmt.Errorf("missing email %s", c.Email)
