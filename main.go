@@ -39,7 +39,6 @@ func main_date() {
 }
 
 func main_add_contact() {
-
 	client, err := gdrive.DefaultClient(".")
 	if err != nil {
 		log.Fatalf("Unable to create client: %v", err)
@@ -82,7 +81,10 @@ func main() {
 		log.Fatalf("Unable to create client: %v", err)
 	}
 
-	var mg mailgun.Mailgun
+	mg, err := mailgun.NewMailgunFromEnv()
+	if err != nil {
+		panic(err)
+	}
 
 	srv, err := sheets.NewService(context.TODO(), option.WithHTTPClient(client))
 	if err != nil {
