@@ -7,13 +7,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/gocarina/gocsv"
 	"github.com/mailgun/mailgun-go/v4"
+	gdrive "gomodules.xyz/gdrive-utils"
 	"gomodules.xyz/mailer"
 	"google.golang.org/api/option"
-	"k8s.io/klog/v2"
-
-	gdrive "gomodules.xyz/gdrive-utils"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -31,7 +28,7 @@ const (
 
 func main_date() {
 	now := time.Now()
-	t2 := Timestamp{now}
+	t2 := mailer.Timestamp{now}
 	fmt.Println(now.UTC())
 
 	s, _ := t2.MarshalCSV()
@@ -54,29 +51,24 @@ func main_add_contact() {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	campaign := getDripCampaign()
+	mg, err := mailgun.NewMailgunFromEnv()
+	if err != nil {
+		panic(err)
+	}
 
-	c := Contact{
+	campaign := getDripCampaign(srv, mg)
+
+	c := mailer.Contact{
 		Email: "tamal@appscode.com",
 		Data: toJson(ContactData{
 			Name:    "Tamal Saha",
 			Product: "KubeDB",
 		}),
 	}
-	err = AddContact(srv, campaign, c)
+	err = campaign.AddContact(c)
 	if err != nil {
 		panic(err)
 	}
-}
-
-func AddContact(srv *sheets.Service, campaign DripCampaign, c Contact) error {
-	campaign.Prepare(&c, time.Now())
-
-	fmt.Println(c.Step_3_Timestamp.IsZero())
-	fmt.Println(c.Step_4_Timestamp.IsZero())
-
-	w := gdrive.NewWriter(srv, spreadsheetId, sheetName)
-	return gocsv.MarshalCSV([]*Contact{&c}, w)
 }
 
 func main() {
@@ -95,81 +87,18 @@ func main() {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	campaign := getDripCampaign()
+	campaign := getDripCampaign(srv, mg)
 
-	err = processCampaign(srv, mg, campaign)
+	err = campaign.ProcessCampaign()
 	if err != nil {
 		panic(err)
 	}
 }
 
-func processCampaign(srv *sheets.Service, mg mailgun.Mailgun, campaign DripCampaign) error {
-	now := time.Now()
-	reader, err := gdrive.NewReader(srv, spreadsheetId, sheetName, 1)
-	if err != nil {
-		return err
-	}
-	var contacts []*Contact
-	err = gocsv.UnmarshalCSV(reader, &contacts)
-	if err != nil {
-		return err
-	}
-	for _, c := range contacts {
-		if c.Stop {
-			continue
-		}
-		if !c.Step_0_Timestamp.IsZero() &&
-			!c.Step_0_WaitForCondition &&
-			now.After(c.Step_0_Timestamp.Time) &&
-			!c.Step_0_Done {
-			if err := processStep(srv, mg, 0, campaign.Steps[0], *c); err != nil {
-				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 0)
-			}
-			continue
-		}
-		if !c.Step_1_Timestamp.IsZero() &&
-			!c.Step_1_WaitForCondition &&
-			now.After(c.Step_1_Timestamp.Time) &&
-			!c.Step_1_Done {
-			if err := processStep(srv, mg, 1, campaign.Steps[1], *c); err != nil {
-				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 1)
-			}
-			continue
-		}
-		if !c.Step_2_Timestamp.IsZero() &&
-			!c.Step_2_WaitForCondition &&
-			now.After(c.Step_2_Timestamp.Time) &&
-			!c.Step_2_Done {
-			if err := processStep(srv, mg, 2, campaign.Steps[2], *c); err != nil {
-				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 2)
-			}
-			continue
-		}
-		if !c.Step_3_Timestamp.IsZero() &&
-			!c.Step_3_WaitForCondition &&
-			now.After(c.Step_3_Timestamp.Time) &&
-			!c.Step_3_Done {
-			if err := processStep(srv, mg, 3, campaign.Steps[3], *c); err != nil {
-				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 3)
-			}
-			continue
-		}
-		if !c.Step_4_Timestamp.IsZero() &&
-			!c.Step_4_WaitForCondition &&
-			now.After(c.Step_4_Timestamp.Time) &&
-			!c.Step_4_Done {
-			if err := processStep(srv, mg, 4, campaign.Steps[4], *c); err != nil {
-				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 4)
-			}
-			continue
-		}
-	}
-	return nil
-}
-
-func getDripCampaign() DripCampaign {
-	campaign := DripCampaign{
-		Steps: []DripCampaignStep{
+func getDripCampaign(srv *sheets.Service, mg mailgun.Mailgun) *mailer.DripCampaign {
+	return &mailer.DripCampaign{
+		Name: "New Signup",
+		Steps: []mailer.CampaignStep{
 			{
 				WaitTime: 0,
 				Mailer: mailer.Mailer{
@@ -216,48 +145,11 @@ func getDripCampaign() DripCampaign {
 				},
 			},
 		},
+		M:             mg,
+		SheetService:  srv,
+		SpreadsheetId: spreadsheetId,
+		SheetName:     sheetName,
 	}
-	return campaign
-}
-
-func processStep(srv *sheets.Service, mg mailgun.Mailgun, stepIndex int, step DripCampaignStep, c Contact) error {
-	var data ContactData
-	if err := json.Unmarshal([]byte(c.Data), &data); err != nil {
-		return err
-	}
-
-	m := step.Mailer
-	m.Params = &data
-	err := m.SendMail(mg, c.Email, "", nil)
-	if err != nil {
-		return err
-	}
-
-	switch stepIndex {
-	case 0:
-		c.Step_0_Done = true
-	case 1:
-		c.Step_1_Done = true
-	case 2:
-		c.Step_2_Done = true
-	case 3:
-		c.Step_3_Done = true
-	case 4:
-		c.Step_4_Done = true
-	}
-
-	w := gdrive.NewRowWriter(srv, spreadsheetId, sheetName, &gdrive.Filter{
-		Header: "email",
-		By: func(v []interface{}) (int, error) {
-			for idx, entry := range v {
-				if entry.(string) == c.Email {
-					return idx, nil
-				}
-			}
-			return -1, fmt.Errorf("missing email %s", c.Email)
-		},
-	})
-	return gocsv.MarshalCSV([]*Contact{&c}, w)
 }
 
 func toJson(v interface{}) string {
