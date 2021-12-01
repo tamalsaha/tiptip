@@ -107,8 +107,14 @@ func (dc *DripCampaign) Prepare(c *Contact, t time.Time) {
 func (dc *DripCampaign) AddContact(c Contact) error {
 	dc.Prepare(&c, time.Now())
 
-	fmt.Println(c.Step_3_Timestamp.IsZero())
-	fmt.Println(c.Step_4_Timestamp.IsZero())
+	si, err := gdrive.NewSpreadsheet(dc.SheetService, dc.SpreadsheetId)
+	if err != nil {
+		return err
+	}
+	_, err = si.EnsureSheet(dc.SheetName, nil)
+	if err != nil {
+		return err
+	}
 
 	w := gdrive.NewWriter(dc.SheetService, dc.SpreadsheetId, dc.SheetName)
 	return gocsv.MarshalCSV([]*Contact{&c}, w)

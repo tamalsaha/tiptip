@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/mailgun/mailgun-go/v4 v4.6.0
 	gomodules.xyz/gdrive-utils v0.0.2
-	gomodules.xyz/mailer v0.0.8
+	gomodules.xyz/mailer v0.0.9
 	google.golang.org/api v0.60.0
 )
 
