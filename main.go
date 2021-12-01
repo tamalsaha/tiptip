@@ -39,7 +39,6 @@ func main_date() {
 }
 
 func main_add_contact() {
-	now := time.Now()
 
 	client, err := gdrive.DefaultClient(".")
 	if err != nil {
@@ -57,7 +56,6 @@ func main_add_contact() {
 		Name    string
 		Product string
 	}
-
 	c := Contact{
 		Email: "tamal@appscode.com",
 		Data: toJson(ContactData{
@@ -65,13 +63,17 @@ func main_add_contact() {
 			Product: "KubeDB",
 		}),
 	}
-	campaign.Prepare(&c, now)
-
-	w := gdrive.NewWriter(srv, spreadsheetId, sheetName)
-	err = gocsv.MarshalCSV([]*Contact{&c}, w)
+	err = AddContact(srv, campaign, c)
 	if err != nil {
 		panic(err)
 	}
+}
+
+func AddContact(srv *sheets.Service, campaign DripCampaign, c Contact) error {
+	campaign.Prepare(&c, time.Now())
+
+	w := gdrive.NewWriter(srv, spreadsheetId, sheetName)
+	return gocsv.MarshalCSV([]*Contact{&c}, w)
 }
 
 func main() {
@@ -112,24 +114,32 @@ func processCampaign(srv *sheets.Service, mg mailgun.Mailgun, campaign DripCampa
 		}
 		if c.Step_0_Timestamp.IsZero() || now.After(c.Step_0_Timestamp.Time) && !c.Step_0_Done {
 			if err := processStep(srv, mg, 0, campaign.Steps[0], *c); err != nil {
-				klog.ErrorS(err)
+				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 0)
 			}
 			continue
 		}
 		if c.Step_1_Timestamp.IsZero() || now.After(c.Step_1_Timestamp.Time) && !c.Step_1_Done {
-			processStep(srv, mg, 1, campaign.Steps[1], *c)
+			if err := processStep(srv, mg, 1, campaign.Steps[1], *c); err != nil {
+				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 1)
+			}
 			continue
 		}
 		if c.Step_2_Timestamp.IsZero() || now.After(c.Step_2_Timestamp.Time) && !c.Step_2_Done {
-			processStep(srv, mg, 2, campaign.Steps[2], *c)
+			if err := processStep(srv, mg, 2, campaign.Steps[2], *c); err != nil {
+				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 2)
+			}
 			continue
 		}
 		if c.Step_3_Timestamp.IsZero() || now.After(c.Step_3_Timestamp.Time) && !c.Step_3_Done {
-			processStep(srv, mg, 3, campaign.Steps[3], *c)
+			if err := processStep(srv, mg, 3, campaign.Steps[3], *c); err != nil {
+				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 3)
+			}
 			continue
 		}
 		if c.Step_4_Timestamp.IsZero() || now.After(c.Step_4_Timestamp.Time) && !c.Step_4_Done {
-			processStep(srv, mg, 4, campaign.Steps[4], *c)
+			if err := processStep(srv, mg, 4, campaign.Steps[4], *c); err != nil {
+				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 4)
+			}
 			continue
 		}
 	}
