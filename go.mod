@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/mailgun/mailgun-go/v4 v4.6.0
-	gomodules.xyz/gdrive-utils v0.0.0-20210829112507-325ac7ee9927
-	gomodules.xyz/mailer v0.0.6
+	gomodules.xyz/gdrive-utils v0.0.1
+	gomodules.xyz/mailer v0.0.7
 	google.golang.org/api v0.60.0
 )
 
@@ -34,8 +34,8 @@ require (
 	github.com/yuin/goldmark v1.4.4 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
-	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420 // indirect
-	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1 // indirect
+	golang.org/x/net v0.0.0-20211123203042-d83791d6bcd9 // indirect
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	gomodules.xyz/encoding v0.0.2 // indirect

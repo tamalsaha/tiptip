@@ -230,7 +230,7 @@ func (dc *DripCampaign) processStep(stepIndex int, step CampaignStep, c Contact)
 		c.Step_4_Done = true
 	}
 
-	w := gdrive.NewRowWriter(dc.SheetService, dc.SpreadsheetId, dc.SheetName, &gdrive.Filter{
+	w := gdrive.NewRowWriter(dc.SheetService, dc.SpreadsheetId, dc.SheetName, &gdrive.Predicate{
 		Header: "email",
 		By: func(v []interface{}) (int, error) {
 			for idx, entry := range v {
