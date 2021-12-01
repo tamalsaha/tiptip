@@ -11,6 +11,7 @@ import (
 	"github.com/mailgun/mailgun-go/v4"
 	"gomodules.xyz/mailer"
 	"google.golang.org/api/option"
+	"k8s.io/klog/v2"
 
 	gdrive "gomodules.xyz/gdrive-utils"
 	"google.golang.org/api/sheets/v4"
@@ -74,8 +75,6 @@ func main_add_contact() {
 }
 
 func main() {
-	now := time.Now()
-
 	client, err := gdrive.DefaultClient(".")
 	if err != nil {
 		log.Fatalf("Unable to create client: %v", err)
@@ -90,22 +89,31 @@ func main() {
 
 	campaign := getDripCampaign()
 
-	reader, err := gdrive.NewReader(srv, spreadsheetId, sheetName, 1)
+	err = processCampaign(srv, mg, campaign)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func processCampaign(srv *sheets.Service, mg mailgun.Mailgun, campaign DripCampaign) error {
+	now := time.Now()
+	reader, err := gdrive.NewReader(srv, spreadsheetId, sheetName, 1)
+	if err != nil {
+		return err
 	}
 	var contacts []*Contact
 	err = gocsv.UnmarshalCSV(reader, &contacts)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	for _, c := range contacts {
-		fmt.Println(c)
 		if c.Stop {
 			continue
 		}
 		if c.Step_0_Timestamp.IsZero() || now.After(c.Step_0_Timestamp.Time) && !c.Step_0_Done {
-			processStep(srv, mg, 0, campaign.Steps[0], *c)
+			if err := processStep(srv, mg, 0, campaign.Steps[0], *c); err != nil {
+				klog.ErrorS(err)
+			}
 			continue
 		}
 		if c.Step_1_Timestamp.IsZero() || now.After(c.Step_1_Timestamp.Time) && !c.Step_1_Done {
@@ -125,6 +133,7 @@ func main() {
 			continue
 		}
 	}
+	return nil
 }
 
 func getDripCampaign() DripCampaign {

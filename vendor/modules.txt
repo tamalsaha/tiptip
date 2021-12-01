@@ -10,6 +10,9 @@ github.com/Masterminds/semver/v3
 # github.com/Masterminds/sprig/v3 v3.2.2
 ## explicit; go 1.13
 github.com/Masterminds/sprig/v3
+# github.com/go-logr/logr v1.2.0
+## explicit; go 1.16
+github.com/go-logr/logr
 # github.com/gocarina/gocsv v0.0.0-20201208093247-67c824bc04d4
 ## explicit; go 1.13
 github.com/gocarina/gocsv
@@ -252,3 +255,6 @@ google.golang.org/protobuf/types/descriptorpb
 google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/timestamppb
+# k8s.io/klog/v2 v2.8.0
+## explicit; go 1.13
+k8s.io/klog/v2

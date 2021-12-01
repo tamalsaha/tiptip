@@ -8,6 +8,7 @@ require (
 	gomodules.xyz/gdrive-utils v0.0.0-20210829112507-325ac7ee9927
 	gomodules.xyz/mailer v0.0.3
 	google.golang.org/api v0.60.0
+	k8s.io/klog/v2 v2.8.0
 )
 
 require (
@@ -15,6 +16,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
+	github.com/go-logr/logr v1.2.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
