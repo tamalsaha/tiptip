@@ -197,7 +197,7 @@ func (dc *DripCampaign) ProcessCampaign() error {
 
 func (dc *DripCampaign) processStep(stepIndex int, step CampaignStep, c Contact) error {
 	var params map[string]interface{}
-	if err := json.Unmarshal([]byte(c.Data), params); err != nil {
+	if err := json.Unmarshal([]byte(c.Data), &params); err != nil {
 		return err
 	}
 
