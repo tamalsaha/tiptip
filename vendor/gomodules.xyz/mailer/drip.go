@@ -114,11 +114,20 @@ func (dc *DripCampaign) AddContact(c Contact) error {
 	return gocsv.MarshalCSV([]*Contact{&c}, w)
 }
 
-func (dc *DripCampaign) Run(ctx context.Context) {
+func (dc *DripCampaign) Run(ctx context.Context) error {
+	si, err := gdrive.NewSpreadsheet(dc.SheetService, dc.SpreadsheetId)
+	if err != nil {
+		return err
+	}
+	_, err = si.EnsureSheet(dc.SheetName, nil)
+	if err != nil {
+		return err
+	}
+
 	for {
 		select {
 		case <-ctx.Done():
-			return
+			return ctx.Err()
 		default:
 		}
 
