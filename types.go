@@ -6,6 +6,11 @@ import (
 	"gomodules.xyz/mailer"
 )
 
+type ContactData struct {
+	Name    string
+	Product string
+}
+
 type Contact struct {
 	Email                   string    `csv:"email"`
 	Data                    string    `csv:"data"` // json format
@@ -32,6 +37,9 @@ type Timestamp struct {
 }
 
 func (date *Timestamp) MarshalCSV() (string, error) {
+	if date.IsZero() {
+		return "", nil
+	}
 	return date.Time.UTC().Format("01/02/2006 15:04:05"), nil
 }
 

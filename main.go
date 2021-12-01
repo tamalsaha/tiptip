@@ -22,6 +22,11 @@ const (
 	spreadsheetId = "10Jx3-1Ww2UQ7xNjs9-CRvJX4iIA22EDu-EsLKoHp1hc"
 	sheetName     = "NEW_SIGNUP"
 	// header        = "email"
+
+	MailLicenseSender  = "license-issuer@mail.appscode.com"
+	MailLicenseTracker = "issued-license-tracker@appscode.com"
+	MailSupport        = "support@appscode.com"
+	MailSales          = "sales@appscode.com"
 )
 
 func main_date() {
@@ -51,10 +56,6 @@ func main_add_contact() {
 
 	campaign := getDripCampaign()
 
-	type ContactData struct {
-		Name    string
-		Product string
-	}
 	c := Contact{
 		Email: "tamal@appscode.com",
 		Data: toJson(ContactData{
@@ -70,6 +71,9 @@ func main_add_contact() {
 
 func AddContact(srv *sheets.Service, campaign DripCampaign, c Contact) error {
 	campaign.Prepare(&c, time.Now())
+
+	fmt.Println(c.Step_3_Timestamp.IsZero())
+	fmt.Println(c.Step_4_Timestamp.IsZero())
 
 	w := gdrive.NewWriter(srv, spreadsheetId, sheetName)
 	return gocsv.MarshalCSV([]*Contact{&c}, w)
@@ -114,31 +118,46 @@ func processCampaign(srv *sheets.Service, mg mailgun.Mailgun, campaign DripCampa
 		if c.Stop {
 			continue
 		}
-		if c.Step_0_Timestamp.IsZero() || (!c.Step_0_WaitForCondition && now.After(c.Step_0_Timestamp.Time) && !c.Step_0_Done) {
+		if !c.Step_0_Timestamp.IsZero() &&
+			!c.Step_0_WaitForCondition &&
+			now.After(c.Step_0_Timestamp.Time) &&
+			!c.Step_0_Done {
 			if err := processStep(srv, mg, 0, campaign.Steps[0], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 0)
 			}
 			continue
 		}
-		if c.Step_1_Timestamp.IsZero() || (!c.Step_1_WaitForCondition && now.After(c.Step_1_Timestamp.Time) && !c.Step_1_Done) {
+		if !c.Step_1_Timestamp.IsZero() &&
+			!c.Step_1_WaitForCondition &&
+			now.After(c.Step_1_Timestamp.Time) &&
+			!c.Step_1_Done {
 			if err := processStep(srv, mg, 1, campaign.Steps[1], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 1)
 			}
 			continue
 		}
-		if c.Step_2_Timestamp.IsZero() || (!c.Step_2_WaitForCondition && now.After(c.Step_2_Timestamp.Time) && !c.Step_2_Done) {
+		if !c.Step_2_Timestamp.IsZero() &&
+			!c.Step_2_WaitForCondition &&
+			now.After(c.Step_2_Timestamp.Time) &&
+			!c.Step_2_Done {
 			if err := processStep(srv, mg, 2, campaign.Steps[2], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 2)
 			}
 			continue
 		}
-		if c.Step_3_Timestamp.IsZero() || (!c.Step_3_WaitForCondition && now.After(c.Step_3_Timestamp.Time) && !c.Step_3_Done) {
+		if !c.Step_3_Timestamp.IsZero() &&
+			!c.Step_3_WaitForCondition &&
+			now.After(c.Step_3_Timestamp.Time) &&
+			!c.Step_3_Done {
 			if err := processStep(srv, mg, 3, campaign.Steps[3], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 3)
 			}
 			continue
 		}
-		if c.Step_4_Timestamp.IsZero() || (!c.Step_4_WaitForCondition && now.After(c.Step_4_Timestamp.Time) && !c.Step_4_Done) {
+		if !c.Step_4_Timestamp.IsZero() &&
+			!c.Step_4_WaitForCondition &&
+			now.After(c.Step_4_Timestamp.Time) &&
+			!c.Step_4_Done {
 			if err := processStep(srv, mg, 4, campaign.Steps[4], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 4)
 			}
@@ -154,46 +173,46 @@ func getDripCampaign() DripCampaign {
 			{
 				WaitTime: 0,
 				Mailer: mailer.Mailer{
-					Sender:          "",
-					BCC:             "",
-					ReplyTo:         "",
+					Sender:          MailLicenseSender,
+					BCC:             MailLicenseTracker,
+					ReplyTo:         MailSales,
 					Subject:         "Welcome to {{.Product}}",
 					Body:            "Hey {{.Name}}, Thanks for using {{.Product}}!",
 					Params:          nil,
 					AttachmentBytes: nil,
 					GDriveFiles:     nil,
 					GoogleDocIds:    nil,
-					EnableTracking:  false,
+					EnableTracking:  true,
 				},
 			},
 			{
 				WaitTime: 10 * time.Second,
 				Mailer: mailer.Mailer{
-					Sender:          "",
-					BCC:             "",
-					ReplyTo:         "",
+					Sender:          MailLicenseSender,
+					BCC:             MailLicenseTracker,
+					ReplyTo:         MailSales,
 					Subject:         "How are things with {{.Product}}",
 					Body:            "Hey {{.Name}}, How are things going with {{.Product}}. If you need help, contact support@appscode.com",
 					Params:          nil,
 					AttachmentBytes: nil,
 					GDriveFiles:     nil,
 					GoogleDocIds:    nil,
-					EnableTracking:  false,
+					EnableTracking:  true,
 				},
 			},
 			{
 				WaitTime: 30 * time.Second,
 				Mailer: mailer.Mailer{
-					Sender:          "",
-					BCC:             "",
-					ReplyTo:         "",
+					Sender:          MailLicenseSender,
+					BCC:             MailLicenseTracker,
+					ReplyTo:         MailSales,
 					Subject:         "Your trial ending soon",
 					Body:            "Hey {{.Name}}, your trial of {{.Product}} is ending soon",
 					Params:          nil,
 					AttachmentBytes: nil,
 					GDriveFiles:     nil,
 					GoogleDocIds:    nil,
-					EnableTracking:  false,
+					EnableTracking:  true,
 				},
 			},
 		},
@@ -202,7 +221,7 @@ func getDripCampaign() DripCampaign {
 }
 
 func processStep(srv *sheets.Service, mg mailgun.Mailgun, stepIndex int, step DripCampaignStep, c Contact) error {
-	var data Contact
+	var data ContactData
 	if err := json.Unmarshal([]byte(c.Data), &data); err != nil {
 		return err
 	}
