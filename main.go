@@ -114,31 +114,31 @@ func processCampaign(srv *sheets.Service, mg mailgun.Mailgun, campaign DripCampa
 		if c.Stop {
 			continue
 		}
-		if c.Step_0_Timestamp.IsZero() || now.After(c.Step_0_Timestamp.Time) && !c.Step_0_Done {
+		if c.Step_0_Timestamp.IsZero() || (!c.Step_0_WaitForCondition && now.After(c.Step_0_Timestamp.Time) && !c.Step_0_Done) {
 			if err := processStep(srv, mg, 0, campaign.Steps[0], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 0)
 			}
 			continue
 		}
-		if c.Step_1_Timestamp.IsZero() || now.After(c.Step_1_Timestamp.Time) && !c.Step_1_Done {
+		if c.Step_1_Timestamp.IsZero() || (!c.Step_1_WaitForCondition && now.After(c.Step_1_Timestamp.Time) && !c.Step_1_Done) {
 			if err := processStep(srv, mg, 1, campaign.Steps[1], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 1)
 			}
 			continue
 		}
-		if c.Step_2_Timestamp.IsZero() || now.After(c.Step_2_Timestamp.Time) && !c.Step_2_Done {
+		if c.Step_2_Timestamp.IsZero() || (!c.Step_2_WaitForCondition && now.After(c.Step_2_Timestamp.Time) && !c.Step_2_Done) {
 			if err := processStep(srv, mg, 2, campaign.Steps[2], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 2)
 			}
 			continue
 		}
-		if c.Step_3_Timestamp.IsZero() || now.After(c.Step_3_Timestamp.Time) && !c.Step_3_Done {
+		if c.Step_3_Timestamp.IsZero() || (!c.Step_3_WaitForCondition && now.After(c.Step_3_Timestamp.Time) && !c.Step_3_Done) {
 			if err := processStep(srv, mg, 3, campaign.Steps[3], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 3)
 			}
 			continue
 		}
-		if c.Step_4_Timestamp.IsZero() || now.After(c.Step_4_Timestamp.Time) && !c.Step_4_Done {
+		if c.Step_4_Timestamp.IsZero() || (!c.Step_4_WaitForCondition && now.After(c.Step_4_Timestamp.Time) && !c.Step_4_Done) {
 			if err := processStep(srv, mg, 4, campaign.Steps[4], *c); err != nil {
 				klog.ErrorS(err, "failed to process campaign step", "email", c.Email, "step", 4)
 			}
