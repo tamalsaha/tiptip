@@ -451,8 +451,8 @@ golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 h1:go1bK/D/BFZV2I8cIQd1N
 golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 gomodules.xyz/gdrive-utils v0.0.0-20210829112507-325ac7ee9927 h1:B6M7uYlg527fB0OCo3xOgnn6ZHs8oiQUhoEBsV7Cpuo=
 gomodules.xyz/gdrive-utils v0.0.0-20210829112507-325ac7ee9927/go.mod h1:mDo1yHgr6oCzAqp+T2nofsyvMeTqozgOxlfNgHYKcvE=
-gomodules.xyz/mailer v0.0.2 h1:amCJUXg2NPblUS7HSOZ+2vgfBARezceBfl6Pvm05zwg=
-gomodules.xyz/mailer v0.0.2/go.mod h1:apxRLh3u4I6GKu7Mtx2ULgy03YU5QP0Kq6kYpVdKDTk=
+gomodules.xyz/mailer v0.0.3 h1:6z01Cnjj1xl5sJB7kXDxY00Je4JhxKOqQQCldIb3r3c=
+gomodules.xyz/mailer v0.0.3/go.mod h1:apxRLh3u4I6GKu7Mtx2ULgy03YU5QP0Kq6kYpVdKDTk=
 gomodules.xyz/sets v0.2.1 h1:vK3oUWoGVrZKLDKO/bzEo/ucHFdCE7+DxWPeWxK72KQ=
 gomodules.xyz/sets v0.2.1/go.mod h1:jKgNp01/iDs+svOWXaPk5cKP3VXy0mWUoTF/ore+aMc=
 google.golang.org/api v0.4.0/go.mod h1:8k5glujaEP+g9n7WNsDg8QP6cUVNI86fCNMcbazEtwE=

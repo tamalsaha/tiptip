@@ -6,7 +6,7 @@ require (
 	github.com/gocarina/gocsv v0.0.0-20201208093247-67c824bc04d4
 	github.com/mailgun/mailgun-go/v4 v4.6.0
 	gomodules.xyz/gdrive-utils v0.0.0-20210829112507-325ac7ee9927
-	gomodules.xyz/mailer v0.0.2
+	gomodules.xyz/mailer v0.0.3
 	gomodules.xyz/sets v0.2.1
 	google.golang.org/api v0.60.0
 )
