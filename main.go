@@ -186,9 +186,9 @@ func processStep(srv *sheets.Service, mg mailgun.Mailgun, stepIndex int, step Dr
 		return err
 	}
 
-	mailer := step.Mailer
-	mailer.Params = &data
-	err := mailer.SendMail(mg, c.Email, "", nil)
+	m := step.Mailer
+	m.Params = &data
+	err := m.SendMail(mg, c.Email, "", nil)
 	if err != nil {
 		return err
 	}
