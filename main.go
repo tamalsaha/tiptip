@@ -13,7 +13,6 @@ import (
 	"google.golang.org/api/option"
 
 	gdrive "gomodules.xyz/gdrive-utils"
-	"gomodules.xyz/sets"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -227,21 +226,4 @@ func toJson(v interface{}) string {
 		panic(err)
 	}
 	return string(data)
-}
-
-func ListEmails(srv *sheets.Service, spreadsheetId string, sheetName string, header string) sets.String {
-	reader, err := gdrive.NewColumnReader(srv, spreadsheetId, sheetName, header)
-	if err != nil {
-		panic(err)
-	}
-	cols, err := reader.ReadAll()
-	if err != nil {
-		panic(err)
-	}
-
-	emails := sets.NewString()
-	for _, row := range cols {
-		emails.Insert(row...)
-	}
-	return emails
 }

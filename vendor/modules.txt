@@ -138,9 +138,6 @@ gomodules.xyz/gdrive-utils
 # gomodules.xyz/mailer v0.0.3
 ## explicit; go 1.17
 gomodules.xyz/mailer
-# gomodules.xyz/sets v0.2.1
-## explicit; go 1.14
-gomodules.xyz/sets
 # google.golang.org/api v0.60.0
 ## explicit; go 1.11
 google.golang.org/api/calendar/v3

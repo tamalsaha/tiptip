@@ -453,8 +453,6 @@ gomodules.xyz/gdrive-utils v0.0.0-20210829112507-325ac7ee9927 h1:B6M7uYlg527fB0O
 gomodules.xyz/gdrive-utils v0.0.0-20210829112507-325ac7ee9927/go.mod h1:mDo1yHgr6oCzAqp+T2nofsyvMeTqozgOxlfNgHYKcvE=
 gomodules.xyz/mailer v0.0.3 h1:6z01Cnjj1xl5sJB7kXDxY00Je4JhxKOqQQCldIb3r3c=
 gomodules.xyz/mailer v0.0.3/go.mod h1:apxRLh3u4I6GKu7Mtx2ULgy03YU5QP0Kq6kYpVdKDTk=
-gomodules.xyz/sets v0.2.1 h1:vK3oUWoGVrZKLDKO/bzEo/ucHFdCE7+DxWPeWxK72KQ=
-gomodules.xyz/sets v0.2.1/go.mod h1:jKgNp01/iDs+svOWXaPk5cKP3VXy0mWUoTF/ore+aMc=
 google.golang.org/api v0.4.0/go.mod h1:8k5glujaEP+g9n7WNsDg8QP6cUVNI86fCNMcbazEtwE=
 google.golang.org/api v0.7.0/go.mod h1:WtwebWUNSVBH/HAw79HIFXZNqEvBhG+Ra+ax0hx3E3M=
 google.golang.org/api v0.8.0/go.mod h1:o4eAsZoiT+ibD93RtjEohWalFOjRDx6CVaqeizhEnKg=
