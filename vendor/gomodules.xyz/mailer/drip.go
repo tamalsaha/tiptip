@@ -122,7 +122,16 @@ func (dc *DripCampaign) Run(ctx context.Context) {
 		default:
 		}
 
-		if err := dc.ProcessCampaign(); err != nil {
+		err := func() (e2 error) {
+			defer func() {
+				if r := recover(); r != nil {
+					e2 = fmt.Errorf("panic: %v [recovered]", r)
+				}
+			}()
+			e2 = dc.ProcessCampaign()
+			return
+		}()
+		if err != nil {
 			klog.ErrorS(err, "failed processing drip campaign", "name", dc.Name)
 		} else {
 			klog.InfoS("completed processing drip campaign", "name", dc.Name)
