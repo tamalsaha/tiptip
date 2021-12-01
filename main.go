@@ -20,10 +20,11 @@ const (
 	sheetName     = "NEW_SIGNUP"
 	// header        = "email"
 
-	MailLicenseSender  = "license-issuer@mail.appscode.com"
+	// MailLicenseSender  = "license-issuer@mail.appscode.com"
 	MailLicenseTracker = "issued-license-tracker@appscode.com"
 	MailSupport        = "support@appscode.com"
-	MailSales          = "sales@appscode.com"
+	// MailSales          = "sales@appscode.com"
+	MailHello          = "hello@appscode.com"
 )
 
 func main_date() {
@@ -102,9 +103,9 @@ func getDripCampaign(srv *sheets.Service, mg mailgun.Mailgun) *mailer.DripCampai
 			{
 				WaitTime: 0,
 				Mailer: mailer.Mailer{
-					Sender:          MailLicenseSender,
+					Sender:          MailHello,
 					BCC:             MailLicenseTracker,
-					ReplyTo:         MailSales,
+					ReplyTo:         MailHello,
 					Subject:         "Welcome to {{.Product}}",
 					Body:            "Hey {{.Name}}, Thanks for using {{.Product}}!",
 					Params:          nil,
@@ -117,9 +118,9 @@ func getDripCampaign(srv *sheets.Service, mg mailgun.Mailgun) *mailer.DripCampai
 			{
 				WaitTime: 10 * time.Second,
 				Mailer: mailer.Mailer{
-					Sender:          MailLicenseSender,
+					Sender:          MailHello,
 					BCC:             MailLicenseTracker,
-					ReplyTo:         MailSales,
+					ReplyTo:         MailHello,
 					Subject:         "How are things with {{.Product}}",
 					Body:            "Hey {{.Name}}, How are things going with {{.Product}}. If you need help, contact support@appscode.com",
 					Params:          nil,
@@ -132,9 +133,9 @@ func getDripCampaign(srv *sheets.Service, mg mailgun.Mailgun) *mailer.DripCampai
 			{
 				WaitTime: 30 * time.Second,
 				Mailer: mailer.Mailer{
-					Sender:          MailLicenseSender,
+					Sender:          MailHello,
 					BCC:             MailLicenseTracker,
-					ReplyTo:         MailSales,
+					ReplyTo:         MailHello,
 					Subject:         "Your trial ending soon",
 					Body:            "Hey {{.Name}}, your trial of {{.Product}} is ending soon",
 					Params:          nil,
