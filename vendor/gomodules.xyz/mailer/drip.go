@@ -151,7 +151,7 @@ func (dc *DripCampaign) Run(ctx context.Context) error {
 		} else {
 			klog.InfoS("completed processing drip campaign", "name", dc.Name)
 		}
-		time.Sleep(120 * time.Hour)
+		time.Sleep(1 * time.Hour)
 	}
 }
 
